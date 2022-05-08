@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, ScrollView } from "react-native";
 import { ListItem } from 'react-native-elements';
 import { ExpenseType } from "../types/expense-type.type";
 import { Expense } from "../types/expense.type";
-// import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from "date-fns";
 
 const expenseTypes: ExpenseType[] = [
@@ -88,12 +88,6 @@ const expenses: Expense[] = [
 ];
 
 export const Expenses: React.FC = () => {
-    const Item = (item: Expense) => (
-        <View >
-            <Text>{item.description}</Text>
-        </View>
-    );
-
     return (
         <ScrollView >
             <View>
@@ -101,7 +95,7 @@ export const Expenses: React.FC = () => {
                     expenses.map((l, i) => (
                         <ListItem key={i} bottomDivider hasTVPreferredFocus={undefined} tvParallaxProperties={undefined}>
                             <View style={styles.listView}>
-                                {/* <Icon style={styles.iconContent} name={l.type.icon} size={20} /> */}
+                                <Icon style={styles.iconContent} name={l.type.icon} size={20} />
                                 <ListItem.Content style={styles.descriptionContent} >
                                     <Text numberOfLines={1} style={[styles.paddingRight10, styles.f14]} >{l.description}</Text>
                                     <ListItem.Subtitle style={styles.f10}>{format(l.time, "d MMM yyyy 'at' hh:mm")}</ListItem.Subtitle>
