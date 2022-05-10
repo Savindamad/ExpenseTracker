@@ -13,6 +13,7 @@ export const BottomTab: React.FC = () => {
         <BottomTabs.Navigator>
             <BottomTabs.Screen name="Expenses" component={Expenses}
                 options={{
+                    headerShown: false,
                     tabBarIcon: (tabInfo) => (<Icon name="clipboard-list" size={25} color={tabInfo.color} />)
                 }} />
             <BottomTabs.Screen name="Report" component={Report} options={{

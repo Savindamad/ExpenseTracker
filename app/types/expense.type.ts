@@ -1,8 +1,8 @@
 import { ExpenseType } from "./expense-type.type";
 
 export type Expense = {
-    description : string;
-    type: ExpenseType;
+    name : string;
     time: Date;
     amount: number;
+    icon: string;
 }
