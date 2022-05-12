@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
-import { ListItem } from "react-native-elements";
+import { Button, ListItem } from "react-native-elements";
 import { openDatabase } from 'react-native-sqlite-storage';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { format } from "date-fns";
@@ -18,19 +18,35 @@ export const ListExpense = () => {
         const database = openDatabase({ name: "expenses.db", createFromLocation: 1 }, (s) => { }, (e) => { console.log(e) });
         database.transaction(async (txn) => {
             await txn.executeSql(
-                `SELECT expense.name, expense.date_time, expense.amount, icon.name as icon FROM expense
+                `SELECT expense.id, expense.name, expense.date_time, expense.amount, icon.name as icon FROM expense
                 INNER JOIN expense_type on expense.type_id = expense_type.id
                 INNER JOIN icon ON expense_type.icon_id = icon.id
-                WHERE strftime('%Y',expense.date_time) = strftime('%Y',date('now')) AND  strftime('%m',expense.date_time) = strftime('%m',date('now'))`,
+                WHERE strftime('%Y',expense.date_time) = strftime('%Y',date('now')) AND  strftime('%m',expense.date_time) = strftime('%m',date('now'))
+                ORDER BY date(expense.date_time) DESC`,
                 [],
                 (tx, res) => {
                     let expenses: Expense[] = [];
                     for (let i = 0; i < res.rows.length; i++) {
                         const item = res.rows.item(i);
-                        expenses.push({ name: item.name, time: new Date(item.date_time), amount: item.amount, icon: item.icon })
+                        expenses.push({ id: item.id, name: item.name, time: new Date(item.date_time), amount: item.amount, icon: item.icon })
                     }
                     setFlatListItems(expenses);
                     setRefreshing(false)
+                }, error => {
+                    console.log(error.message);
+                }
+            );
+        });
+    }
+
+    const deleteExpense = (id: number) => {
+        const database = openDatabase({ name: "expenses.db", createFromLocation: 1 }, (s) => { }, (e) => { console.log(e) });
+        database.transaction(async (txn) => {
+            await txn.executeSql(
+                `DELETE FROM expense WHERE id = ?`,
+                [id],
+                (tx, res) => {
+                    onRefresh();
                 }, error => {
                     console.log(error.message);
                 }
@@ -50,7 +66,19 @@ export const ListExpense = () => {
             <View>
                 {
                     flatListItems.map((l, i) => (
-                        <ListItem key={i} bottomDivider hasTVPreferredFocus={undefined} tvParallaxProperties={undefined}>
+                        <ListItem.Swipeable key={l.id} bottomDivider rightContent={
+                            <View style={{ flexDirection: 'row' }}>
+                                <Button
+                                    icon={<Icon name='pencil' size={30} />}
+                                    buttonStyle={{ minHeight: '100%', minWidth: '50%', backgroundColor: 'transparent' }}
+                                />
+                                <Button
+                                    onPress={() => deleteExpense(l.id)}
+                                    icon={<Icon style={{ color: 'white' }} name='delete' size={30} />}
+                                    buttonStyle={{ minHeight: '100%', minWidth: '50%', backgroundColor: 'red', borderRadius: 0 }}
+                                />
+                            </View>
+                        } >
                             <View style={styles.listView}>
                                 <Icon style={styles.iconContent} name={l.icon} size={20} />
                                 <ListItem.Content style={styles.descriptionContent} >
@@ -61,7 +89,7 @@ export const ListExpense = () => {
                                     <ListItem.Title style={styles.f16}>€{l.amount}</ListItem.Title>
                                 </ListItem.Content>
                             </View>
-                        </ListItem>
+                        </ListItem.Swipeable>
                     ))
                 }
             </View>
