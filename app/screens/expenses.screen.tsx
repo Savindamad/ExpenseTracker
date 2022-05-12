@@ -1,11 +1,10 @@
 import React from "react";
-import { StyleSheet } from "react-native";
-import { Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { ListExpense } from "./expenses/list-expense.screen";
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AddExpense } from "./expenses/add-expense.screen";
+import { Pressable } from "react-native";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,13 +15,20 @@ export const Expenses = ({ navigation }) => {
                 options={{
                     headerTitle: 'Expenses',
                     headerRight: () => (
-                        <Button type="clear"
-                            onPress={() => navigation.navigate("AddExpense")}
-                            icon={<Icon name="plus-circle-outline" size={25} />}
-                        />
+                        <Pressable onPress={() => navigation.navigate("AddExpense")}>
+                            <Icon name="plus-circle-outline" size={30} />
+                        </Pressable>
                     ),
                 }} />
-            <Stack.Screen name="AddExpense" component={AddExpense} options={{ title: 'Add expense' }} />
+            <Stack.Screen name="AddExpense" component={AddExpense}
+                options={{
+                    headerLeft: () => (
+                        <Pressable onPress={() => navigation.navigate("ListExpense")}>
+                            <Icon name="chevron-left" size={40} />
+                        </Pressable>
+                    ),
+                    title: 'Add expense'
+                }} />
         </Stack.Navigator>
     );
 }

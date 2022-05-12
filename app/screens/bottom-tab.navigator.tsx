@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Expenses } from "./expenses.screen";
 import { Report } from "./report.screen";
-import { Settings } from "./settings.screen";
+import { Config } from "./config.screen";
 
 const BottomTabs = createBottomTabNavigator();
 
@@ -19,9 +19,11 @@ export const BottomTab: React.FC = () => {
             <BottomTabs.Screen name="Report" component={Report} options={{
                 tabBarIcon: (tabInfo) => (<Icon name="chart-line" size={25} color={tabInfo.color} />)
             }} />
-            <BottomTabs.Screen name="Settings" component={Settings} options={{
-                tabBarIcon: (tabInfo) => (<Icon name="cogs" size={25} color={tabInfo.color} />)
-            }} />
+            <BottomTabs.Screen name="Configurations" component={Config}
+                options={{
+                    headerShown: false,
+                    tabBarIcon: (tabInfo) => (<Icon name="cogs" size={25} color={tabInfo.color} />)
+                }} />
         </BottomTabs.Navigator>
     );
 }

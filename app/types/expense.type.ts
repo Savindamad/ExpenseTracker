@@ -4,5 +4,6 @@ export type Expense = {
     name : string;
     time: Date;
     amount: number;
+    typeId?: number;
     icon: string;
 }
