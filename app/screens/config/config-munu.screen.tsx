@@ -29,7 +29,7 @@ export const ConfigMenu = ({ navigation }) => {
                     <ListItem.Content style={styles.descriptionContent} >
                         <Text numberOfLines={1} style={[common.pr_10, common.fs_m]} >Fixed expences</Text>
                     </ListItem.Content>
-                    <Pressable onPress={() => navigation.navigate("ExpenseTypes")}>
+                    <Pressable onPress={() => navigation.navigate("FixedExpense")}>
                         <Icon name="chevron-right" size={30} />
                     </Pressable>
                 </View>
@@ -42,7 +42,7 @@ export const ConfigMenu = ({ navigation }) => {
                     <ListItem.Content style={styles.descriptionContent} >
                         <Text numberOfLines={1} style={[common.pr_10, common.fs_m]} >Income</Text>
                     </ListItem.Content>
-                    <Pressable onPress={() => navigation.navigate("ExpenseTypes")}>
+                    <Pressable onPress={() => navigation.navigate("Income")}>
                         <Icon name="chevron-right" size={30} />
                     </Pressable>
                 </View>
