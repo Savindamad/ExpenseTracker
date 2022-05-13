@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
-import { ExpenseType } from "../../../types/expense-type.type";
 import { openDatabase } from 'react-native-sqlite-storage';
 import { Button, ListItem } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
-export const ListExpenseTypes = ({ navigation }) => {
+import { common } from "../../../styles/common.style";
+import { ExpenseType } from "../../../types/expense-type.type";
+
+export const ListExpenseTypes = () => {
     let [flatListItems, setFlatListItems] = useState<ExpenseType[]>([]);
-    const [refreshing, setRefreshing] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         getExpenseTypes()
@@ -18,7 +20,8 @@ export const ListExpenseTypes = ({ navigation }) => {
         database.transaction(async (txn) => {
             await txn.executeSql(
                 `SELECT expense_type.id, expense_type.name, expense_type.cat_limit, expense_type.is_system, expense_type.description, icon.name As icon FROM expense_type
-                INNER JOIN icon ON expense_type.icon_id = icon.id;`,
+                INNER JOIN icon ON expense_type.icon_id = icon.id
+                WHERE expense_type.type = 'PRIMARY';`,
                 [],
                 (tx, res) => {
                     let expenseTypes: ExpenseType[] = [];
@@ -49,7 +52,7 @@ export const ListExpenseTypes = ({ navigation }) => {
         const database = openDatabase({ name: "expenses.db", createFromLocation: 1 }, (s) => { }, (e) => { console.log(e) });
         database.transaction(async (txn) => {
             await txn.executeSql(
-                `DELETE FROM expense WHERE id = ?`,
+                `DELETE FROM expense_type WHERE id = ?`,
                 [id],
                 (tx, res) => {
                     onRefresh();
@@ -87,14 +90,14 @@ export const ListExpenseTypes = ({ navigation }) => {
                                 />
                             </View>
                         }>
-                            <View style={styles.listView}>
-                                <Icon style={styles.iconContent} name={l.icon ? l.icon : ''} size={20} />
+                            <View style={common.fd_r}>
+                                <Icon style={common.f_1} name={l.icon ? l.icon : ''} size={20} />
                                 <ListItem.Content style={styles.descriptionContent} >
-                                    <Text numberOfLines={1} style={[styles.paddingRight10, styles.f14]} >{l.name}</Text>
-                                    <ListItem.Subtitle style={styles.f10}>{l.description}</ListItem.Subtitle>
+                                    <Text numberOfLines={1} style={[common.pr_10, common.fs_m]} >{l.name}</Text>
+                                    <ListItem.Subtitle style={common.fs_es}>{l.description}</ListItem.Subtitle>
                                 </ListItem.Content>
                                 <ListItem.Content style={styles.amountContent} >
-                                    <ListItem.Title style={styles.f16}>€{l.limit}</ListItem.Title>
+                                    <ListItem.Title style={common.fs_l}>€{l.limit}</ListItem.Title>
                                 </ListItem.Content>
                             </View>
                         </ListItem.Swipeable>
@@ -106,29 +109,11 @@ export const ListExpenseTypes = ({ navigation }) => {
 }
 
 const styles = StyleSheet.create({
-    listView: {
-        flexDirection: 'row'
-    },
-    iconContent: {
-        flex: 1
-    },
     descriptionContent: {
         flex: 7
     },
     amountContent: {
         flex: 2,
         alignItems: 'flex-end'
-    },
-    paddingRight10: {
-        paddingRight: 10
-    },
-    f16: {
-        fontSize: 16
-    },
-    f14: {
-        fontSize: 14
-    },
-    f10: {
-        fontSize: 10
     }
 });

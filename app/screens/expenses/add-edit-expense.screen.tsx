@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { TextInput, View } from "react-native";
 import { openDatabase } from 'react-native-sqlite-storage';
 import { Button, Text } from "react-native-elements";
 import RNPickerSelect from 'react-native-picker-select';
 import { FakeCurrencyInput } from 'react-native-currency-input';
 
 import { PickerData } from "../../types/picker-data.type";
+import { Expense } from "../../types/expense.type";
+import { pickerSelectStyles } from "../../styles/picker.style";
+import { common } from "../../styles/common.style";
 
-export const AddEditExpense = ({ navigation }) => {
-    const [nameValue, onChangeName] = useState<string>('');
-    const [typeValue, onChangeType] = useState('');
-    const [amountValue, onChangeAmount] = useState<number | null>(0);
+export const AddEditExpense = ({ navigation, route }) => {
+    let editData: Expense = route.params ? JSON.parse(route.params) : null;
+    // if (editData) {
+    //     navigation.setOptions({ title: 'Edit expense' });
+    // }
+
+    const [nameValue, onChangeName] = useState<string>(editData ? editData.name : '');
+    const [typeValue, onChangeType] = useState(editData ? editData.typeId : 0);
+    const [amountValue, onChangeAmount] = useState<number | null>(editData ? editData.amount : 0);
+
     let database;
 
     const [typeListItems, setTypeListItems] = useState<PickerData[]>([]);
@@ -18,7 +27,7 @@ export const AddEditExpense = ({ navigation }) => {
         database = openDatabase({ name: "expenses.db", createFromLocation: 1 }, (s) => { }, (e) => { console.log(e) });
         database.transaction((txn) => {
             txn.executeSql(
-                `SELECT * FROM expense_type`,
+                `SELECT * FROM expense_type where type='PRIMARY'`,
                 [],
                 (tx, res) => {
                     let expensesTypes: PickerData[] = [];
@@ -35,34 +44,49 @@ export const AddEditExpense = ({ navigation }) => {
     }, []);
 
 
-    const addExpense = () => {
+    const addEditExpense = () => {
         database = openDatabase({ name: "expenses.db", createFromLocation: 1 }, (s) => { }, (e) => { console.log(e) });
-        database.transaction((txn) => {
-            txn.executeSql(
-                `INSERT INTO expense (name, type_id, date_time, amount) VALUES (?, ?, ?, ?)`,
-                [nameValue, parseInt(typeValue), new Date().toISOString(), amountValue],
-                (tx, res) => {
-                    navigation.navigate("ListExpense");
-                }, error => {
-                    console.log(error.message);
-                }
-            );
-        });
+        if (editData) {
+            database.transaction((txn) => {
+                txn.executeSql(
+                    `UPDATE expense SET name=?, amount=?, type_id=? WHERE id=?;`,
+                    [nameValue, typeValue, amountValue, editData.id],
+                    (tx, res) => {
+                        navigation.navigate("ListExpense");
+                    }, error => {
+                        console.log(error.message);
+                    }
+                );
+            });
+        }
+        else {
+            database.transaction((txn) => {
+                txn.executeSql(
+                    `INSERT INTO expense (name, type_id, date_time, amount) VALUES (?, ?, ?, ?)`,
+                    [nameValue, typeValue, new Date().toISOString(), amountValue],
+                    (tx, res) => {
+                        navigation.navigate("ListExpense");
+                    }, error => {
+                        console.log(error.message);
+                    }
+                );
+            });
+        }
     }
 
     return (
-        <View style={{ backgroundColor: 'white', flex: 1 }}>
+        <View style={[common.bc_white, common.f_1]}>
             <View>
-                <Text style={styles.label}>Expense<Text style={{ color: 'red' }}>*</Text>
+                <Text style={common.label}>Expense<Text style={common.c_red}>*</Text>
                 </Text>
-                <TextInput style={[styles.input, styles.mh10, styles.p10]}
+                <TextInput style={[common.input, common.mh_10, common.p_10]}
                     onChangeText={onChangeName} value={nameValue} placeholder="Ex: Grossay items for week" />
             </View>
             <View>
-                <Text style={styles.label}>Amount<Text style={{ color: 'red' }}>*</Text>
+                <Text style={common.label}>Amount<Text style={common.c_red}>*</Text>
                 </Text>
                 <FakeCurrencyInput
-                    style={[styles.input, styles.mh10, {paddingHorizontal: 10, paddingVertical: 7}]}
+                    style={[common.input, common.mh_10, common.ph_10, common.pv_7]}
                     value={amountValue}
                     onChangeValue={value => onChangeAmount(value)}
                     prefix="€"
@@ -72,7 +96,7 @@ export const AddEditExpense = ({ navigation }) => {
                 />
             </View>
             <View>
-                <Text style={styles.label}>Choose expense type<Text style={{ color: 'red' }}>*</Text>
+                <Text style={common.label}>Choose expense type<Text style={common.c_red}>*</Text>
                 </Text>
                 <RNPickerSelect
                     placeholder={{}}
@@ -85,56 +109,10 @@ export const AddEditExpense = ({ navigation }) => {
                 />
             </View>
             <Button
-                style={[styles.p10, { marginTop: 10 }]}
-                title="Add expense"
-                onPress={() => addExpense()}
+                style={[common.p_10, common.mt_10]}
+                title={editData ? "Update expense" : "Add expense"}
+                onPress={() => addEditExpense()}
             />
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    label: {
-        paddingHorizontal: 10,
-        paddingTop: 10,
-        paddingBottom: 5,
-        fontSize: 16
-    },
-    m10: {
-        margin: 10
-    },
-    mh10: {
-        marginHorizontal: 10
-    },
-    p10: {
-        padding: 10
-    },
-    input: {
-        backgroundColor: "white",
-        borderWidth: 1,
-        borderRadius: 2,
-        borderColor: 'grey',
-        fontSize: 14,
-    },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-    inputIOS: {
-        fontSize: 14,
-        padding: 10,
-        borderWidth: 1,
-        borderColor: 'gray',
-        borderRadius: 2,
-        color: 'black',
-        marginHorizontal: 10
-    },
-    inputAndroid: {
-        fontSize: 14,
-        padding: 10,
-        borderWidth: 1,
-        borderColor: 'gray',
-        borderRadius: 2,
-        color: 'black',
-        marginHorizontal: 10
-    },
-});

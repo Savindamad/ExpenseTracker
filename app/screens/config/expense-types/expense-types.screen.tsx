@@ -1,11 +1,10 @@
 import React from "react";
-import { Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Pressable } from "react-native";
 
 import { ListExpenseTypes } from "./list-expense-types.screen";
 import { AddEditExpenseType } from "./add-edit-expense-typese.screen";
-import { Pressable } from "react-native";
 
 
 const Stack = createNativeStackNavigator();
