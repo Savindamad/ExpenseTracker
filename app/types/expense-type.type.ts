@@ -3,6 +3,6 @@ export type ExpenseType = {
     name: string;
     isSystem: boolean;
     description?: string;
-    icon?: string;
-    limit?: number;
+    icon: string;
+    limit: number;
 }

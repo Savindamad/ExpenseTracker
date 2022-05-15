@@ -17,6 +17,15 @@ export const common = StyleSheet.create({
     mt_10: {
         marginTop: 10
     },
+    mt_5: {
+        marginTop: 5
+    },
+    mb_5: {
+        marginBottom: 5
+    },
+    mr_5: {
+        marginRight: 5
+    },
     p_0: {
         padding: 0
     },
