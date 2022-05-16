@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 export const pickerSelectStyles = StyleSheet.create({
     inputIOS: {
@@ -8,7 +8,7 @@ export const pickerSelectStyles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 2,
         color: 'black',
-        marginHorizontal: 10
+        marginHorizontal: 10,
     },
     inputAndroid: {
         fontSize: 14,
@@ -17,6 +17,6 @@ export const pickerSelectStyles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 2,
         color: 'black',
-        marginHorizontal: 10
+        marginHorizontal: 10,
     },
 });

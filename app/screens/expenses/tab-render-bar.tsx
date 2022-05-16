@@ -1,7 +1,7 @@
-import React from "react";
-import { StyleSheet } from "react-native";
+import React from 'react';
+import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-export const TabRenderBar = (props) => {
+export const TabRenderBar = props => {
     const inputRange = props.navigationState.routes.map((x, i) => i);
 
     return (
@@ -9,16 +9,19 @@ export const TabRenderBar = (props) => {
             {props.navigationState.routes.map((route, i) => {
                 const opacity = props.position.interpolate({
                     inputRange,
-                    outputRange: inputRange.map((inputIndex) =>
-                        inputIndex === i ? 1 : 0.5
+                    outputRange: inputRange.map(inputIndex =>
+                        inputIndex === i ? 1 : 0.5,
                     ),
                 });
 
                 return (
                     <TouchableOpacity
                         style={styles.tabItem}
-                        onPress={() => this.setState({ index: i })}>
-                        <Animated.Text style={{ opacity }}>{route.title}</Animated.Text>
+                        onPress={() => this.setState({ index: i })}
+                    >
+                        <Animated.Text style={{ opacity }}>
+                            {route.title}
+                        </Animated.Text>
                     </TouchableOpacity>
                 );
             })}
@@ -28,15 +31,15 @@ export const TabRenderBar = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
+        flex: 1,
     },
     tabBar: {
-      flexDirection: 'row',
-      paddingTop: 50,
+        flexDirection: 'row',
+        paddingTop: 50,
     },
     tabItem: {
-      flex: 1,
-      alignItems: 'center',
-      padding: 16,
+        flex: 1,
+        alignItems: 'center',
+        padding: 16,
     },
-  });
+});

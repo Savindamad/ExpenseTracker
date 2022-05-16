@@ -25,15 +25,15 @@ export const AddEditExpense = ({ navigation, route }) => {
     );
     const [typeListItems, setTypeListItems] = useState<PickerData[]>([]);
 
-    let database;
-
     useEffect(() => {
-        database = openDatabase(
+        const database = openDatabase(
             { name: 'expenses.db', createFromLocation: 1 },
-            () => { },
-            ()=> { },
+            () => {},
+            e => {
+                console.log(e);
+            },
         );
-        database.transaction((txn) => {
+        database.transaction(txn => {
             txn.executeSql(
                 "SELECT * FROM expense_type where type='PRIMARY'",
                 [],
@@ -48,18 +48,18 @@ export const AddEditExpense = ({ navigation, route }) => {
                         });
                     }
                     setTypeListItems(expensesTypes);
-                }, error => {
+                },
+                error => {
                     console.log(error.message);
-                }
+                },
             );
         });
     }, []);
 
-
     const addEditExpense = () => {
-        database = openDatabase(
+        const database = openDatabase(
             { name: 'expenses.db', createFromLocation: 1 },
-            s => { },
+            () => {},
             e => {
                 console.log(e);
             },
@@ -69,12 +69,12 @@ export const AddEditExpense = ({ navigation, route }) => {
                 txn.executeSql(
                     'UPDATE expense SET name=?, amount=?, type_id=? WHERE id=?;',
                     [nameValue, typeValue, amountValue, editData.id],
-                    (tx, res) => {
+                    () => {
                         navigation.navigate('ListExpense');
                     },
                     error => {
                         console.log(error.message);
-                    }
+                    },
                 );
             });
         } else {
@@ -87,7 +87,7 @@ export const AddEditExpense = ({ navigation, route }) => {
                         new Date().toISOString(),
                         amountValue,
                     ],
-                    (tx, res) => {
+                    () => {
                         navigation.navigate('ListExpense');
                     },
                     error => {

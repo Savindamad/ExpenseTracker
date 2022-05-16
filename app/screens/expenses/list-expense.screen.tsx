@@ -21,6 +21,7 @@ import { common } from '../../styles/common.style';
 import { ExpenseType } from '../../types/expense-type.type';
 import { ExpenseSummary } from '../../types/expense-sumary.type';
 import { ExpenseSummaryCal } from '../../calculations/expense-summary.calculation';
+import { PickerData } from '../../types/picker-data.type';
 
 export const ListExpense = ({ navigation }) => {
     const [flatListItems, setFlatListItems] = useState<Expense[]>([]);
@@ -37,8 +38,44 @@ export const ListExpense = ({ navigation }) => {
     ]);
 
     useEffect(() => {
-        // getExpenseTypes();
+        getExpenseTypes();
     }, []);
+
+    const getExpenseTypes = () => {
+        const database = openDatabase(
+            { name: 'expenses.db', createFromLocation: 1 },
+            () => {},
+            e => {
+                console.log(e);
+            },
+        );
+        database.transaction(txn => {
+            txn.executeSql(
+                `SELECT expense_type.id, expense_type.name, expense_type.cat_limit, expense_type.is_system, expense_type.description, icon.name As icon FROM expense_type
+                INNER JOIN icon ON expense_type.icon_id = icon.id
+                WHERE expense_type.type = 'PRIMARY';`,
+                [],
+                (tx, res) => {
+                    let expenseTypes: ExpenseType[] = [];
+                    for (let i = 0; i < res.rows.length; i++) {
+                        const item = res.rows.item(i);
+                        expenseTypes.push({
+                            id: item.id,
+                            name: item.name,
+                            isSystem: item.is_system,
+                            limit: item.cat_limit,
+                            icon: item.icon,
+                        });
+                    }
+                    setExpenseTypesList(expenseTypes);
+                    getExpenses();
+                },
+                error => {
+                    console.log(error.message);
+                },
+            );
+        });
+    };
 
     const getExpenses = () => {
         const database = openDatabase(
@@ -88,7 +125,7 @@ export const ListExpense = ({ navigation }) => {
     const deleteExpense = (id: number) => {
         const database = openDatabase(
             { name: 'expenses.db', createFromLocation: 1 },
-            s => {},
+            () => {},
             e => {
                 console.log(e);
             },
@@ -97,7 +134,7 @@ export const ListExpense = ({ navigation }) => {
             await txn.executeSql(
                 'DELETE FROM expense WHERE id = ?',
                 [id],
-                (tx, res) => {
+                () => {
                     onRefresh();
                 },
                 error => {
