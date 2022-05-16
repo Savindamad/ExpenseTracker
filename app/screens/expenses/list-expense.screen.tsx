@@ -39,7 +39,7 @@ export const ListExpense = ({ navigation }) => {
 
     useEffect(() => {
         getExpenseTypes();
-    }, []);
+    });
 
     const getExpenseTypes = () => {
         const database = openDatabase(
@@ -80,7 +80,7 @@ export const ListExpense = ({ navigation }) => {
     const getExpenses = () => {
         const database = openDatabase(
             { name: 'expenses.db', createFromLocation: 1 },
-            s => {},
+            () => {},
             e => {
                 console.log(e);
             },
@@ -295,7 +295,7 @@ export const ListExpense = ({ navigation }) => {
                             inputIndex === i ? 1 : 0.5,
                         ),
                     });
-                    const borderBottomWidth = opacity == 1 ? 1 : 0;
+                    const borderBottomWidth = opacity === 1 ? 1 : 0;
 
                     return (
                         <TouchableOpacity
