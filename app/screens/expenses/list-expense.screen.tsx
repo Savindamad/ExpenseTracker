@@ -10,7 +10,6 @@ import {
     View,
 } from 'react-native';
 import { Button, ListItem } from 'react-native-elements';
-import { openDatabase } from 'react-native-sqlite-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 import { TabView, SceneMap } from 'react-native-tab-view';
@@ -21,7 +20,11 @@ import { common } from '../../styles/common.style';
 import { ExpenseType } from '../../types/expense-type.type';
 import { ExpenseSummary } from '../../types/expense-sumary.type';
 import { ExpenseSummaryCal } from '../../calculations/expense-summary.calculation';
-import { PickerData } from '../../types/picker-data.type';
+import {
+    deleteExpense,
+    getExpenses,
+    getExpenseTypes,
+} from '../../services/expense.service';
 
 export const ListExpense = ({ navigation }) => {
     const [flatListItems, setFlatListItems] = useState<Expense[]>([]);
@@ -38,83 +41,22 @@ export const ListExpense = ({ navigation }) => {
     ]);
 
     useEffect(() => {
-        getExpenseTypes();
+        getExpenseTypeList();
     });
 
-    const getExpenseTypes = () => {
-        const database = openDatabase(
-            { name: 'expenses.db', createFromLocation: 1 },
-            () => {},
-            e => {
-                console.log(e);
-            },
-        );
-        database.transaction(txn => {
-            txn.executeSql(
-                `SELECT expense_type.id, expense_type.name, expense_type.cat_limit, expense_type.is_system, expense_type.description, icon.name As icon FROM expense_type
-                INNER JOIN icon ON expense_type.icon_id = icon.id
-                WHERE expense_type.type = 'PRIMARY';`,
-                [],
-                (tx, res) => {
-                    let expenseTypes: ExpenseType[] = [];
-                    for (let i = 0; i < res.rows.length; i++) {
-                        const item = res.rows.item(i);
-                        expenseTypes.push({
-                            id: item.id,
-                            name: item.name,
-                            isSystem: item.is_system,
-                            limit: item.cat_limit,
-                            icon: item.icon,
-                        });
-                    }
-                    setExpenseTypesList(expenseTypes);
-                    getExpenses();
-                },
-                error => {
-                    console.log(error.message);
-                },
-            );
+    const getExpenseTypeList = () => {
+        getExpenseTypes().then(expenseTypes => {
+            setExpenseTypesList(expenseTypes);
+            getExpenseList();
         });
     };
 
-    const getExpenses = () => {
-        const database = openDatabase(
-            { name: 'expenses.db', createFromLocation: 1 },
-            () => {},
-            e => {
-                console.log(e);
-            },
-        );
-        database.transaction(async txn => {
-            txn.executeSql(
-                `SELECT expense.id, expense.name, expense.date_time, expense.amount, expense.type_id, icon.name as icon FROM expense
-                INNER JOIN expense_type on expense.type_id = expense_type.id
-                INNER JOIN icon ON expense_type.icon_id = icon.id
-                WHERE strftime('%Y',expense.date_time) = strftime('%Y',date('now')) AND  strftime('%m',expense.date_time) = strftime('%m',date('now'))
-                ORDER BY date(expense.date_time) DESC`,
-                [],
-                (tx, res) => {
-                    let expenses: Expense[] = [];
-                    for (let i = 0; i < res.rows.length; i++) {
-                        const item = res.rows.item(i);
-                        expenses.push({
-                            id: item.id,
-                            name: item.name,
-                            time: new Date(item.date_time),
-                            typeId: item.type_id,
-                            amount: item.amount,
-                            icon: item.icon,
-                        });
-                    }
-                    setFlatListItems(expenses);
-                    summaryList = ExpenseSummaryCal(expenses, expenseTypesList);
-                    setSummaryList(summaryList);
-                    setRefreshing(false);
-                },
-                error => {
-                    console.log(error.message);
-                },
-            );
+    const getExpenseList = () => {
+        getExpenses().then(expenses => {
+            setFlatListItems(expenses);
+            summaryList = ExpenseSummaryCal(expenses, expenseTypesList);
+            setSummaryList(summaryList);
+            setRefreshing(false);
         });
     };
 
@@ -122,96 +64,84 @@ export const ListExpense = ({ navigation }) => {
         navigation.navigate('AddEditExpense', JSON.stringify(expense));
     };
 
-    const deleteExpense = (id: number) => {
-        const database = openDatabase(
-            { name: 'expenses.db', createFromLocation: 1 },
-            () => {},
-            e => {
-                console.log(e);
-            },
-        );
-        database.transaction(async txn => {
-            await txn.executeSql(
-                'DELETE FROM expense WHERE id = ?',
-                [id],
-                () => {
-                    onRefresh();
-                },
-                error => {
-                    console.log(error.message);
-                },
-            );
-        });
-    };
-
     const onRefresh = () => {
-        getExpenses();
+        getExpenseList();
     };
 
     const listExense = () => (
-        <ScrollView
-            refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-        >
-            <View>
-                {flatListItems.map((l, i) => (
-                    <ListItem.Swipeable
-                        key={l.id}
-                        bottomDivider
-                        rightContent={
-                            <View style={{ flexDirection: 'row' }}>
-                                <Button
-                                    onPress={() => editExpense(l)}
-                                    icon={<Icon name="pencil" size={30} />}
-                                    buttonStyle={{
-                                        minHeight: '100%',
-                                        minWidth: '50%',
-                                        backgroundColor: 'transparent',
-                                    }}
+        <View>
+            <ScrollView
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }>
+                <View>
+                    {flatListItems.map((l, i) => (
+                        <ListItem.Swipeable
+                            key={l.id}
+                            bottomDivider
+                            rightContent={
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Button
+                                        onPress={() => editExpense(l)}
+                                        icon={<Icon name="pencil" size={30} />}
+                                        buttonStyle={{
+                                            minHeight: '100%',
+                                            minWidth: '50%',
+                                            backgroundColor: 'transparent',
+                                        }}
+                                    />
+                                    <Button
+                                        onPress={() => deleteExpense(l.id)}
+                                        icon={
+                                            <Icon
+                                                style={{ color: 'white' }}
+                                                name="delete"
+                                                size={30}
+                                            />
+                                        }
+                                        buttonStyle={{
+                                            minHeight: '100%',
+                                            minWidth: '50%',
+                                            backgroundColor: 'red',
+                                            borderRadius: 0,
+                                        }}
+                                    />
+                                </View>
+                            }>
+                            <View style={common.fd_r}>
+                                <Icon
+                                    style={common.f_1}
+                                    name={l.icon}
+                                    size={20}
                                 />
-                                <Button
-                                    onPress={() => deleteExpense(l.id)}
-                                    icon={
-                                        <Icon
-                                            style={{ color: 'white' }}
-                                            name="delete"
-                                            size={30}
-                                        />
-                                    }
-                                    buttonStyle={{
-                                        minHeight: '100%',
-                                        minWidth: '50%',
-                                        backgroundColor: 'red',
-                                        borderRadius: 0,
-                                    }}
-                                />
+                                <ListItem.Content
+                                    style={styles.descriptionContent}>
+                                    <Text
+                                        numberOfLines={1}
+                                        style={[common.pr_10, common.fs_m]}>
+                                        {l.name}
+                                    </Text>
+                                    <ListItem.Subtitle style={common.fs_s}>
+                                        {format(
+                                            l.time,
+                                            "d MMM yyyy 'at' hh:mm",
+                                        )}
+                                    </ListItem.Subtitle>
+                                </ListItem.Content>
+                                <ListItem.Content style={styles.amountContent}>
+                                    <ListItem.Title style={common.fs_l}>
+                                        €{l.amount}
+                                    </ListItem.Title>
+                                </ListItem.Content>
                             </View>
-                        }
-                    >
-                        <View style={common.fd_r}>
-                            <Icon style={common.f_1} name={l.icon} size={20} />
-                            <ListItem.Content style={styles.descriptionContent}>
-                                <Text
-                                    numberOfLines={1}
-                                    style={[common.pr_10, common.fs_m]}
-                                >
-                                    {l.name}
-                                </Text>
-                                <ListItem.Subtitle style={common.fs_s}>
-                                    {format(l.time, "d MMM yyyy 'at' hh:mm")}
-                                </ListItem.Subtitle>
-                            </ListItem.Content>
-                            <ListItem.Content style={styles.amountContent}>
-                                <ListItem.Title style={common.fs_l}>
-                                    €{l.amount}
-                                </ListItem.Title>
-                            </ListItem.Content>
-                        </View>
-                    </ListItem.Swipeable>
-                ))}
-            </View>
-        </ScrollView>
+                        </ListItem.Swipeable>
+                    ))}
+                </View>
+            </ScrollView>
+        </View>
     );
 
     const summaryItem = (key: number, summary: ExpenseSummary) => {
@@ -275,8 +205,7 @@ export const ListExpense = ({ navigation }) => {
         <ScrollView
             refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-        >
+            }>
             <View style={[common.f_1, common.pv_10, common.bc_white]}>
                 {summaryList.map((l, i) => summaryItem(i, l))}
             </View>
@@ -295,17 +224,14 @@ export const ListExpense = ({ navigation }) => {
                             inputIndex === i ? 1 : 0.5,
                         ),
                     });
-                    const borderBottomWidth = opacity === 1 ? 1 : 0;
+                    // const borderBottomWidth = opacity === 1 ? 1 : 0;
 
                     return (
                         <TouchableOpacity
                             key={i}
                             style={styles.tabItem}
-                            onPress={() => setIndex(i)}
-                        >
-                            <Animated.Text
-                                style={{ opacity, borderBottomWidth }}
-                            >
+                            onPress={() => setIndex(i)}>
+                            <Animated.Text style={{ opacity }}>
                                 {route.title}
                             </Animated.Text>
                         </TouchableOpacity>

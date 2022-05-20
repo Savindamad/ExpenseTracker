@@ -1,9 +1,8 @@
-import { openDatabase, SQLiteDatabase } from 'react-native-sqlite-storage';
-import { Expense } from '../types/expense.type';
+import { openDatabase } from 'react-native-sqlite-storage';
 
 const database_name = 'expenses.db';
 
-export const getDBConnection = async () => {
+export const getDBConnection = () => {
     return openDatabase(
         { name: database_name, createFromLocation: 1 },
         () => {},

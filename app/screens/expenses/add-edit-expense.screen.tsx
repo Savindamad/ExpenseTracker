@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { TextInput, View } from 'react-native';
-import { openDatabase } from 'react-native-sqlite-storage';
 import { Button, Text } from 'react-native-elements';
 import RNPickerSelect from 'react-native-picker-select';
 import { FakeCurrencyInput } from 'react-native-currency-input';
@@ -9,6 +8,11 @@ import { PickerData } from '../../types/picker-data.type';
 import { Expense } from '../../types/expense.type';
 import { pickerSelectStyles } from '../../styles/picker.style';
 import { common } from '../../styles/common.style';
+import {
+    addExpense,
+    getExpenseTypesForDropdown,
+    updateExpense,
+} from '../../services/expense.service';
 
 export const AddEditExpense = ({ navigation, route }) => {
     let editData: Expense = route.params ? JSON.parse(route.params) : null;
@@ -26,74 +30,26 @@ export const AddEditExpense = ({ navigation, route }) => {
     const [typeListItems, setTypeListItems] = useState<PickerData[]>([]);
 
     useEffect(() => {
-        const database = openDatabase(
-            { name: 'expenses.db', createFromLocation: 1 },
-            () => {},
-            e => {
-                console.log(e);
-            },
-        );
-        database.transaction(txn => {
-            txn.executeSql(
-                "SELECT * FROM expense_type where type='PRIMARY'",
-                [],
-                (tx, res) => {
-                    let expensesTypes: PickerData[] = [];
-                    for (let i = 0; i < res.rows.length; i++) {
-                        const item = res.rows.item(i);
-                        expensesTypes.push({
-                            key: item.id,
-                            label: item.name,
-                            value: item.id,
-                        });
-                    }
-                    setTypeListItems(expensesTypes);
-                },
-                error => {
-                    console.log(error.message);
-                },
-            );
+        getExpenseTypesForDropdown('PRIMARY').then(expensesTypes => {
+            setTypeListItems(expensesTypes);
         });
     }, []);
 
     const addEditExpense = () => {
-        const database = openDatabase(
-            { name: 'expenses.db', createFromLocation: 1 },
-            () => {},
-            e => {
-                console.log(e);
-            },
-        );
+        const expense: Expense = {
+            id: editData ? editData.id : 0,
+            name: nameValue,
+            typeId: typeValue,
+            time: new Date(),
+            amount: amountValue ? amountValue : 0,
+            icon: '',
+        };
+
         if (editData) {
-            database.transaction(txn => {
-                txn.executeSql(
-                    'UPDATE expense SET name=?, amount=?, type_id=? WHERE id=?;',
-                    [nameValue, typeValue, amountValue, editData.id],
-                    () => {
-                        navigation.navigate('ListExpense');
-                    },
-                    error => {
-                        console.log(error.message);
-                    },
-                );
-            });
+            updateExpense(expense);
         } else {
-            database.transaction(txn => {
-                txn.executeSql(
-                    'INSERT INTO expense (name, type_id, date_time, amount) VALUES (?, ?, ?, ?)',
-                    [
-                        nameValue,
-                        typeValue,
-                        new Date().toISOString(),
-                        amountValue,
-                    ],
-                    () => {
-                        navigation.navigate('ListExpense');
-                    },
-                    error => {
-                        console.log(error.message);
-                    },
-                );
+            addExpense(expense).then(() => {
+                navigation.navigate('ListExpense');
             });
         }
     };

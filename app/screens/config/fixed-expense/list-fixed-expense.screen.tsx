@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     RefreshControl,
     ScrollView,
@@ -12,53 +12,30 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { common } from '../../../styles/common.style';
 import { FixedExpense } from '../../../types/fixed-expense.type';
+import { getFixedExpenses } from '../../../services/expense.service';
 
 export const ListFixedExpense = () => {
-    const [flatListItems, setFlatListItems] = useState<FixedExpense[]>([]);
+    const [fixedExpenseList, setFixedExpenseList] = useState<FixedExpense[]>(
+        [],
+    );
     const [refreshing, setRefreshing] = useState(false);
 
-    useEffect(() => {
-        getExpenseTypes();
+    const loadDataCallback = useCallback(async () => {
+        try {
+            getExpenseTypes();
+        } catch (error) {
+            console.error(error);
+        }
     }, []);
 
-    const getExpenseTypes = () => {
-        const database = openDatabase(
-            { name: 'expenses.db', createFromLocation: 1 },
-            () => {},
-            e => {
-                console.log(e);
-            },
-        );
-        database.transaction(async txn => {
-            await txn.executeSql(
-                `SELECT EF.id, EF.name, EF.type_id, EF.date_time, EF.amount, EF.start_date, EF.end_date, I.name 
-                FROM expense_fixed EF
-                INNER JOIN expense_type ET ON EF.type_id = ET.id
-                INNER JOIN icon I on ET.icon_id = I.id;`,
-                [],
-                (tx, res) => {
-                    let expenseTypes: FixedExpense[] = [];
-                    for (let i = 0; i < res.rows.length; i++) {
-                        const item = res.rows.item(i);
-                        expenseTypes.push({
-                            id: item.id,
-                            name: item.name,
-                            createdTime: new Date(),
-                            amount: item.amount,
-                            typeId: item.type_id,
-                            icon: item.icon,
-                            startedDate: new Date(),
-                            endDate: new Date(),
-                        });
-                    }
-                    setFlatListItems(expenseTypes);
-                    setRefreshing(false);
-                },
-                error => {
-                    console.log(error.message);
-                },
-            );
-        });
+    useEffect(() => {
+        loadDataCallback();
+    }, [loadDataCallback]);
+
+    const getExpenseTypes = async () => {
+        const expenseTypes = await getFixedExpenses();
+        setFixedExpenseList(expenseTypes);
+        setRefreshing(false);
     };
 
     const editExpenseType = (type: FixedExpense) => {
@@ -95,10 +72,9 @@ export const ListFixedExpense = () => {
         <ScrollView
             refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-        >
+            }>
             <View>
-                {flatListItems.map((l, i) => (
+                {fixedExpenseList.map((l, i) => (
                     <ListItem.Swipeable
                         key={l.id}
                         bottomDivider
@@ -130,8 +106,7 @@ export const ListFixedExpense = () => {
                                     }}
                                 />
                             </View>
-                        }
-                    >
+                        }>
                         <View style={common.fd_r}>
                             <Icon
                                 style={common.f_1}
