@@ -17,8 +17,7 @@ export const FixedExpense = ({ navigation }) => {
                 options={{
                     headerLeft: () => (
                         <Pressable
-                            onPress={() => navigation.navigate('ConfigMenu')}
-                        >
+                            onPress={() => navigation.navigate('ConfigMenu')}>
                             <Icon name="chevron-left" size={40} />
                         </Pressable>
                     ),
@@ -28,8 +27,7 @@ export const FixedExpense = ({ navigation }) => {
                         <Pressable
                             onPress={() =>
                                 navigation.navigate('AddEditFixedExpense')
-                            }
-                        >
+                            }>
                             <Icon name="plus-circle-outline" size={30} />
                         </Pressable>
                     ),
@@ -43,8 +41,7 @@ export const FixedExpense = ({ navigation }) => {
                         <Pressable
                             onPress={() =>
                                 navigation.navigate('ListFixedExpense')
-                            }
-                        >
+                            }>
                             <Icon name="chevron-left" size={40} />
                         </Pressable>
                     ),

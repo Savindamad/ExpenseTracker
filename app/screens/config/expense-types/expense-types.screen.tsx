@@ -17,8 +17,7 @@ export const ExpenseTypes = ({ navigation }) => {
                 options={{
                     headerLeft: () => (
                         <Pressable
-                            onPress={() => navigation.navigate('ConfigMenu')}
-                        >
+                            onPress={() => navigation.navigate('ConfigMenu')}>
                             <Icon name="chevron-left" size={40} />
                         </Pressable>
                     ),
@@ -28,8 +27,7 @@ export const ExpenseTypes = ({ navigation }) => {
                         <Pressable
                             onPress={() =>
                                 navigation.navigate('AddExpenseType')
-                            }
-                        >
+                            }>
                             <Icon name="plus-circle-outline" size={30} />
                         </Pressable>
                     ),
@@ -43,8 +41,7 @@ export const ExpenseTypes = ({ navigation }) => {
                         <Pressable
                             onPress={() =>
                                 navigation.navigate('ListExpenseTypes')
-                            }
-                        >
+                            }>
                             <Icon name="chevron-left" size={40} />
                         </Pressable>
                     ),

@@ -95,8 +95,7 @@ export const ListExpenseTypes = () => {
         <ScrollView
             refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-        >
+            }>
             <View>
                 {flatListItems.map((l, i) => (
                     <ListItem.Swipeable
@@ -131,8 +130,7 @@ export const ListExpenseTypes = () => {
                                     }}
                                 />
                             </View>
-                        }
-                    >
+                        }>
                         <View style={common.fd_r}>
                             <Icon
                                 style={common.f_1}
@@ -142,8 +140,7 @@ export const ListExpenseTypes = () => {
                             <ListItem.Content style={styles.descriptionContent}>
                                 <Text
                                     numberOfLines={1}
-                                    style={[common.pr_10, common.fs_m]}
-                                >
+                                    style={[common.pr_10, common.fs_m]}>
                                     {l.name}
                                 </Text>
                                 <ListItem.Subtitle style={common.fs_es}>

@@ -17,8 +17,7 @@ export const Income = ({ navigation }) => {
                 options={{
                     headerLeft: () => (
                         <Pressable
-                            onPress={() => navigation.navigate('ConfigMenu')}
-                        >
+                            onPress={() => navigation.navigate('ConfigMenu')}>
                             <Icon name="chevron-left" size={40} />
                         </Pressable>
                     ),
@@ -26,8 +25,9 @@ export const Income = ({ navigation }) => {
                     headerTitle: 'Income',
                     headerRight: () => (
                         <Pressable
-                            onPress={() => navigation.navigate('AddEditIncome')}
-                        >
+                            onPress={() =>
+                                navigation.navigate('AddEditIncome')
+                            }>
                             <Icon name="plus-circle-outline" size={30} />
                         </Pressable>
                     ),
@@ -39,8 +39,7 @@ export const Income = ({ navigation }) => {
                 options={{
                     headerLeft: () => (
                         <Pressable
-                            onPress={() => navigation.navigate('ListIncome')}
-                        >
+                            onPress={() => navigation.navigate('ListIncome')}>
                             <Icon name="chevron-left" size={40} />
                         </Pressable>
                     ),

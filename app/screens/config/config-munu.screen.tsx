@@ -13,8 +13,7 @@ export const ConfigMenu = ({ navigation }) => {
                 key="1"
                 bottomDivider
                 hasTVPreferredFocus={undefined}
-                tvParallaxProperties={undefined}
-            >
+                tvParallaxProperties={undefined}>
                 <View style={[common.fd_r, common.m_0, common.p_0]}>
                     <View style={[styles.iconView, common.ai_c]}>
                         <Icon
@@ -26,14 +25,12 @@ export const ConfigMenu = ({ navigation }) => {
                     <ListItem.Content style={styles.descriptionContent}>
                         <Text
                             numberOfLines={1}
-                            style={[common.pr_10, common.fs_m]}
-                        >
+                            style={[common.pr_10, common.fs_m]}>
                             Expenses types
                         </Text>
                     </ListItem.Content>
                     <Pressable
-                        onPress={() => navigation.navigate('ExpenseTypes')}
-                    >
+                        onPress={() => navigation.navigate('ExpenseTypes')}>
                         <Icon name="chevron-right" size={30} />
                     </Pressable>
                 </View>
@@ -43,8 +40,7 @@ export const ConfigMenu = ({ navigation }) => {
                 key="2"
                 bottomDivider
                 hasTVPreferredFocus={undefined}
-                tvParallaxProperties={undefined}
-            >
+                tvParallaxProperties={undefined}>
                 <View style={[common.fd_r, common.m_0, common.p_0]}>
                     <View style={[styles.iconView, common.ai_c]}>
                         <Icon
@@ -56,14 +52,12 @@ export const ConfigMenu = ({ navigation }) => {
                     <ListItem.Content style={styles.descriptionContent}>
                         <Text
                             numberOfLines={1}
-                            style={[common.pr_10, common.fs_m]}
-                        >
+                            style={[common.pr_10, common.fs_m]}>
                             Fixed expences
                         </Text>
                     </ListItem.Content>
                     <Pressable
-                        onPress={() => navigation.navigate('FixedExpense')}
-                    >
+                        onPress={() => navigation.navigate('FixedExpense')}>
                         <Icon name="chevron-right" size={30} />
                     </Pressable>
                 </View>
@@ -73,8 +67,7 @@ export const ConfigMenu = ({ navigation }) => {
                 key="3"
                 bottomDivider
                 hasTVPreferredFocus={undefined}
-                tvParallaxProperties={undefined}
-            >
+                tvParallaxProperties={undefined}>
                 <View style={[common.fd_r, common.m_0, common.p_0]}>
                     <View style={[styles.iconView, common.ai_c]}>
                         <Icon
@@ -86,8 +79,7 @@ export const ConfigMenu = ({ navigation }) => {
                     <ListItem.Content style={styles.descriptionContent}>
                         <Text
                             numberOfLines={1}
-                            style={[common.pr_10, common.fs_m]}
-                        >
+                            style={[common.pr_10, common.fs_m]}>
                             Income
                         </Text>
                     </ListItem.Content>

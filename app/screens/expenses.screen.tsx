@@ -20,8 +20,7 @@ export const Expenses = ({ navigation }) => {
                         <Pressable
                             onPress={() =>
                                 navigation.navigate('AddEditExpense')
-                            }
-                        >
+                            }>
                             <Icon name="plus-circle-outline" size={30} />
                         </Pressable>
                     ),
@@ -33,8 +32,7 @@ export const Expenses = ({ navigation }) => {
                 options={{
                     headerLeft: () => (
                         <Pressable
-                            onPress={() => navigation.navigate('ListExpense')}
-                        >
+                            onPress={() => navigation.navigate('ListExpense')}>
                             <Icon name="chevron-left" size={40} />
                         </Pressable>
                     ),
